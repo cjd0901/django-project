@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .ajaxform,.ajaxedit{
+            position:absolute;
+            left:50%;
+            top:50%;
+            margin-left:-150px;
+            margin-top: -200px;
+        }
+        .shade1,.shade2{
+            position:fixed;
+            right: 0;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background-color: antiquewhite;
+            opacity: 0.6;
+        }
+        .hide1,.hide2{
+            display: none;
+        }
+        .sub,.cancel,.can2{
+            width:40px;
+            height:30px;
+            background-color: cornflowerblue;
+            cursor: pointer;
+            opacity: 0.3;
+            border-radius: 10px;
+            line-height: 30px;
+            text-align: center;
+
+        }
+        .sex{
+            display: inline;
+        }
+        .update{
+            width:80px;
+            height:30px;
+            background-color: cornflowerblue;
+            cursor: pointer;
+            opacity: 0.3;
+            border-radius: 10px;
+            line-height: 30px;
+            text-align: center;
+        }
+        .csid{
+            display: none;
+        }
+        #stu_id{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <a href="/add_students">添加学生</a>
+        <a href="javascript:void(0)" onclick="addstudents1()">ajax添加学生</a>
+    </div>
+    <div>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>姓名</th>
+                    <th>年龄</th>
+                    <th>性别</th>
+                    <th>班级</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in stu_list %}
+                    <tr nid="{{ row.id }}">
+                        <th>
+                            {{ row.id }}
+                        </th>
+                        <th>
+                            {{ row.username }}
+                        </th>
+                        <th>
+                            {{ row.age }}
+                        </th>
+                        <th>
+                            {% if row.sex == 0 %}
+                                女
+                            {% endif%}
+                            {% if row.sex == 1 %}
+                                男
+                            {% endif %}
+                        </th>
+                        <th>
+                            {{ row.cs.title }}
+                        </th>
+                        <th class="csid">
+                            {{ row.cs.id }}
+                        </th>
+                        <th>
+                            <a href="/del_students?sid={{ row.id }}">删除</a>
+                            |
+                            <a href="javascript:void(0)" onclick="removeStu(this)">ajax删除</a>
+                            |
+                            <a href="/edit_students?sid={{ row.id }}">编辑</a>
+                            |
+                            <a href="javascript:void(0)" onclick="ajaxedit(this)" index="i1">ajax编辑</a>
+                        </th>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="shade1 hide1"></div>
+    <div class="ajaxform hide1">
+        <p><h1>ajax添加学生</h1></p>
+        <p><input type="text" id="username" placeholder="姓名"></p>
+        <p><input type="text" id="age" placeholder="年龄"></p>
+        <div class="sex">
+            男<input type="radio" name="gender" value="1"/>
+            女<input type="radio" name="gender" value="0"/>
+        </div>
+        <p>
+            <select id="sel1">
+                {% for cs in cs_list %}
+                    <option value="{{ cs.id }}">{{ cs.title }}</option>
+                {% endfor %}
+            </select>
+        </p>
+        <p><div class="sub" onclick="addstudents2()">提交</div></p>
+        <p><div class="cancel" onclick="can()">取消</div></p>
+    </div>
+
+    <div class="shade2 hide2"></div>
+    <div class="ajaxedit hide2">
+        <input type="text" id="stu_id">
+        <p><h1>ajax编辑学生</h1></p>
+        <p><input type="text" id="username2" ></p>
+        <p><input type="text" id="age2"></p>
+        <div class="sex2">
+            男<input type="radio" name="gender" value="1"/>
+            女<input type="radio" name="gender" value="0"/>
+        </div>
+        <p>
+            <select id="sel2">
+                {% for cs in cs_list %}
+                    <option value="{{ cs.id }}">{{ cs.title }}</option>
+                {% endfor %}
+            </select>
+        </p>
+        <p><div class="update" onclick="editstudent()">保存修改</div></p>
+        <p><div class="can2" onclick="can2()">取消</div></p>
+    </div>
+    <script src="/static/jquery-3.3.1.js"></script>
+    <script>
+
+        function removeStu(self){
+            var nid = $(self).parent().parent().attr('nid')
+
+            $.ajax({
+                url:'ajax4',
+                type:'GET',
+                data:{nid:nid},
+                success:function(arg){
+                    if(arg == '成功'){
+                        //window.location.reload()  //通过刷新更新页面
+                        $(self).parent().parent().remove()  //通过js直接删除页面数据
+                    }else {
+                        alert(arg)
+                    }
+                }
+            })
+        }
+
+        function addstudents1(){
+            $(".shade1").removeClass("hide1").next().removeClass("hide1")
+        }
+        function addstudents2() {
+            var username = $("#username").val()
+            var age = $("#age").val()
+            var sex = $(".sex input:checked").val() //获取性别
+            var cls_id = $("#sel1").val()
+            console.log(username, age, sex, cls_id)
+            //$(".shade1").addClass("hide1").next().addClass("hide1")
+            $.ajax({
+                url: 'ajax5',
+                type: 'POST',
+                data: {
+                    username: username,
+                    age: age,
+                    sex: sex,
+                    cls_id: cls_id,
+                },
+                success: function (arg) {
+                    if (arg == '成功') {
+                        window.location.reload()
+                    } else {
+                        alert(arg)
+                    }
+                }
+            })
+        }
+        function can(){
+            $(".shade1").addClass("hide1").next().addClass("hide1")
+        }
+        function ajaxedit(self){
+            $(".shade2").removeClass("hide2").next().removeClass("hide2")
+            var sid = $(self).parent().parent().attr('nid')
+            //$.trim去除左右空格
+            var usedname = $.trim($(self).parent().parent().children("th").eq(1).html())
+            var age = $.trim($(self).parent().parent().children("th").eq(2).html())
+            var sex = $.trim($(self).parent().parent().children("th").eq(3).html())
+            var cls_id = $.trim($(self).parent().parent().children("th").eq(5).html())
+            //console.log(usedname,age,sex,cls_id)
+            $("#stu_id").val(sid)
+            $("#username2").val(usedname)
+            $("#age2").val(age)
+            if(sex == '男'){
+               $(".sex2 :radio").eq(0).prop("checked",true)
+            }else{
+               $(".sex2 :radio").eq(1).prop("checked",true)
+            }
+            for(var i = 0;i<$("#sel2 option").length;i++){
+                //console.log($.trim($("#sel2 option").eq(i).val()) == cls_id)
+                if($.trim($("#sel2 option").eq(i).val()) == cls_id){
+                    $("#sel2 option").eq(i).attr("selected","selected")
+                }
+            }
+        }
+        function editstudent(){
+            var sid = $("#stu_id").val()
+            var username = $("#username2").val()
+            var age = $("#age2").val()
+            var sex = $(".sex2 input:checked").val()
+            var cls_id = $("#sel2").val()
+            console.log(sid,username,age,sex,cls_id)
+            $.ajax({
+                url:"ajax6",
+                type:"POST",
+                data:{
+                    sid:sid,
+                    username:username,
+                    age:age,
+                    sex:sex,
+                    cls_id:cls_id,
+                },
+                success:function (arg) {
+                    if(arg == '成功'){
+                        window.location.reload()
+                    }else{
+                        alert(arg)
+                    }
+                }
+            })
+        }
+        function can2(){
+            $(".shade2").addClass("hide2").next().addClass("hide2")
+        }
+    </script>
+</body>
+</h

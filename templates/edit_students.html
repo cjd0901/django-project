@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <form action="/edit_students?sid={{ obj.id }}" method="POST">
+        {% csrf_token %}
+        <p><input type="text" name="username" value="{{ obj.username }}"></p>
+        <p><input type="text" name="age" value="{{ obj.age }}"></p>
+        <p>
+            {% if obj.sex == 1 %}
+                男<input type="radio" name="gender" value="1" checked=true>
+                女<input type="radio" name="gender" value="0">
+            {% elif obj.sex == 0 %}
+                男<input type="radio" name="gender" value="1">
+                女<input type="radio" name="gender" value="0" checked=true>
+            {% endif %}
+
+        </p>
+        <p>
+            <select name="cs">
+
+                {% for cs in cs_list %}
+                    {% if cs.id == obj.cs.id %}
+                        <option value="{{ obj.cs.id }}" selected="selected">{{ obj.cs.title }}</option>
+                    {% else %}
+                        <option value="{{ cs.id }}">{{ cs.title }}</option>
+                    {% endif %}
+                {% endfor %}
+
+            </select>
+        </p>
+        <p>
+            <input type="submit" value="提交"/>
+        </p>
+    </form>
+</body>
+</html>
